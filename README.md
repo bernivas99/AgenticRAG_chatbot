@@ -45,14 +45,14 @@ Arxiv:
 + For retrieving data from arXiv, the ArxivQueryRun() tool is used.
 
 
-Others elements of the architecture:
+### Others elements of the architecture:
 
 Persistent checkpointing: MemorySaver() for context accumulation
 
 Future expansion could include web browser tools, human in the loop method.
 
 
-6. Setup and Installation
+### Setup and Installation
 
 + API keys are saved in the 'apikeys_agenticRAG_chatbot.yaml' file. Here we only use the API key for Groq models.
 + The Kaggle dataset is saved as a csv file under the name 'WikiMainPage.csv'
