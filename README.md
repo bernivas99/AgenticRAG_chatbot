@@ -1,18 +1,15 @@
 # AgenticRAG_chatbot
-Chatbot with Agentic RAG
 
 ### Introduction 
 The project implements an agentic RAG chatbot that uses a combination of LLM reasoning and information retrieval from Wikipedia pages and arXiv.
 The utilized framework is  LangGraph.
 
 
-
 ### System Architecture
-The structure of the agentic RAG chatbot can be seen on the following diagram:
 
 The architecture is composed of:
 
-+ Dataset pre-processing: The collection of URLs is made up of URLs of Wikipedia pages, and a fixed list of URLs related to Python, Pytorch and Hugging Face. The Wikipedia pages are retrieved from a Kaggle dataset which can be found here: 'https://www.kaggle.com/datasets/pseudopoo/main-pages-of-wikipedia'.
++ Dataset pre-processing: The collection of URLs is made up of URLs of Wikipedia pages, and a fixed list of URLs related to Python, Pytorch and Hugging Face. 
 + The chatbot: It is an LLM from ChatGroq, the Qwen/QwQ-32B model. It is a reasoning model with 32-billion parameters. QwQ-32B excels at mathematical reasoning, coding, and complex-problem solving with performance comparable to the 20x larger DeepSeek-R1.
 + Tools: The chatbot has access to two types of Tools, the first one is a collection of URLs, the second one is an arXiv searcher.
 + Transitions between the architecture components
@@ -33,82 +30,37 @@ The Step-by-step Query flow is the following:
 1. The user inputs a query
 2. The LLM receives it via chatbot node
 3. Based on its own decision the LLM routes to tool(s) 
-4. The tool retrieves documents
+4. If yes, the LLM retrieves documents from the tool
 5. The LLM combines the retrieved information to make a response
 6. The response is outputted to the user
 
 ### Tools and Data preprocessing
 
-Embedding + VectorStore (e.g. HuggingFace embeddings + FAISS)
-(e.g. CSV loading, URL mapping)
-
-Wikipedia:
-
-Source: Main Topics CSV or Hugging Face dataset
-
-Method: Title-to-URL transformation → retrieval
+Collection of URLs:
++ fixed URLs related to Python, Pytorch and Hugging Face, which gives opportunity to more topic-specific information retrieval.
++ URLs of Wikipedia pages. The Wikipedia pages are retrieved from a Kaggle dataset which can be found here: 'https://www.kaggle.com/datasets/pseudopoo/main-pages-of-wikipedia'. Tha Kaggle dataset is saved as a CSV file, loaded and then the URLs are created from the Wikipedia page titles with the function load_wikipedia_urls. The first 10 URLs is chosen to be included in the retrieve_docs_from_urls Tool. This is mainly because in my own laptop it takes much time to repsonse for the chatbot if more URLs are added. Needless to say, if more resources are available, the more URLs can be added and the more information the chatbot can have access to.
++ The retrieved information from the URLs is splitted into chunks with RecursiveCharacterTextSplitter. The embeddings of the documents are created with HuggingFaceEmbeddings with one of the Sentence Transformer model: all-MiniLM-L6-v2. The vectorstore for the document chunks and their embeddings is created with FAISS.
 
 Arxiv:
++ For retrieving data from arXiv, the ArxivQueryRun() tool is used.
 
-Tool: ArxivQueryRun()
 
-Logic: On LLM instruction, fetch summaries from Arxiv API
+Others elements of the architecture:
 
-Error Handling: Wrapped to avoid second-call failures
+Persistent checkpointing: MemorySaver() for context accumulation
 
-Others (Optional):
+Future expansion could include web browser tools, human in the loop method.
 
-Memory: MemorySaver for context accumulation
-
-Future expansion (e.g. TavilySearch, browser tools)
-
-5. Technical Design Decisions
-Why use LangGraph vs. vanilla LangChain agents?
-
-Why vectorstore choice (FAISS vs. Chroma)?
-
-Why use structured tools (@tool) over plain functions?
-
-Handling of tool call failures and retries
-
-Streaming vs. blocking inference
-
-✅ Example:
-
-We chose LangGraph to better modularize agent behavior and visualize control flow. Structured tools are used to ensure schema consistency for OpenAI tool-calling.
 
 6. Setup and Installation
-Required packages (pip install ...)
 
-Environment variables (e.g. OPENAI_API_KEY, GROQ_API_KEY)
++ API keys are saved in the 'apikeys_agenticRAG_chatbot.yaml' file. Here we only use the API key for Groq models.
++ The Kaggle dataset is saved as a csv file under the name 'WikiMainPage.csv'
++ To interact with the chatbot, the last cell of the notebook can be used after running the whole notebook. The chatbot asks for new user input after every generated answer. In order to end the conversation with the chatbot, type 'exit' or 'quit'.
++ The required packagescan be installed with requirements.txt
 
-How to run in a Jupyter notebook vs. script
 
-Optional: requirements.txt or conda.yaml
 
-7. How to Extend
-Add a new tool (e.g. Semantic Scholar)
 
-Swap LLMs (e.g. use Claude or Mistral)
 
-Use a persistent vectorstore backend
 
-Enable multi-turn memory via MemorySaver or custom storage
-
-8. Known Limitations / Future Work
-Arxiv tool state bug (solved via per-call instantiation)
-
-Limited memory or context window
-
-Rate limits on external APIs
-
-Future: integrate citations, full document previews, chat history
-
-9. Appendix
-Code snippets for each component
-
-Sample inputs/outputs
-
-Prompt templates (if custom prompts used)
-
-Graph diagram source (e.g. Mermaid, draw.io)
