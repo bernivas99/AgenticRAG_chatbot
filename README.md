@@ -24,40 +24,24 @@ The role of the nodes:
 + The Chatbot node realizes the LLM with which the user is interacting.
 + The Tool node contains the specific tools which the LLm has access to.
 
-There are two types of edges in the graph: fixed edges and conditional edges. The fixed edges define a fix route from one node to another, while the conditional edges allows to choose which node to go next based on the current state of the graph. In the implemented graph, the LLM can choose between utilizing a tool or not (it is implemented by the function tool_condition). We let the LLM to decide on its own based on the current state. 
- 
+There are two types of edges in the graph: fixed edges and conditional edges. The fixed edges define a fix route from one node to another, while the conditional edges allows to choose which node to go next based on the current state of the graph. 
+
+In the implemented graph, the graph flow follows the transitions START → chatbot → tools → END. Also, since conditional edges are defined between the LLM and the tools, the LLM can choose between utilizing a tool or not (it is implemented by the function tool_condition). We let the LLM to decide on its own based on the current state. 
+
+The Step-by-step Query flow is the following:
+
+1. The user inputs a query
+2. The LLM receives it via chatbot node
+3. Based on its own decision the LLM routes to tool(s) 
+4. The tool retrieves documents
+5. The LLM combines the retrieved information to make a response
+6. The response is outputted to the user
+
+### Tools and Data preprocessing
 
 Embedding + VectorStore (e.g. HuggingFace embeddings + FAISS)
 (e.g. CSV loading, URL mapping)
 
-Graph Flow: How state transitions occur between nodes (START → chatbot → tools → END)
-
-3. Data Flow and Logic
-Step-by-step Query Flow:
-
-User inputs a query
-
-LLM receives it via chatbot node
-
-Based on intent, LLM routes to tool(s) (ToolNode)
-
-Tool fetches document or summary
-
-LLM finalizes a response
-
-Output is streamed to user
-
-LangGraph State Usage: What’s tracked in state (e.g. messages, agent_action, tool_outputs, etc.)
-
-✅ Include:
-
-How tools are selected
-
-How results are embedded and retrieved
-
-Any retry or fallback behavior
-
-4. Tools and External Data Sources
 Wikipedia:
 
 Source: Main Topics CSV or Hugging Face dataset
