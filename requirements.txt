@@ -1,0 +1,11 @@
+pyyaml
+ipython
+typing_extensions
+langchain
+langgraph
+langchain-community
+langchain-groq
+datasets
+faiss-cpu  
+huggingface-hub
+unstructured[all]
